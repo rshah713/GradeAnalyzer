@@ -1,0 +1,75 @@
+<Button>:
+    font_name: 'Roboto-Bold'
+    background_normal: '' #https://stackoverflow.com/a/49100826/12514570
+    font_size: 40
+<Main>:
+    
+    targetlabel: tgtlbl
+    weightlabel: wgtlbl
+    weightneeded: wgtneeded
+    pointsneeded: ptsneeded
+    
+        
+    GridLayout:
+        cols: 1
+        size_hint_y: None
+        size : root.width, root.height
+
+        TextInput:
+            id: filename
+            hint_text: "file.html"
+            background_color: 1,1,1,1
+                
+        FloatLayout:
+            # so size hint works
+            Button:
+                text: "Read File"
+                color: (0.12156862745098039, 0.9176470588235294, 0, 1)
+                background_color: (1, 1, 1, 1)
+                    
+                pos_hint: {'center_x': 0.5, "top":0.6}
+                size_hint: (.6, .4) # button_width, button_height
+                    
+                on_press: root.read_data(filename.text)
+        Widget:
+        
+        Label:
+            text: "Customize:"
+            font_size: 40
+            color: 0.12156862745098039, 0.9176470588235294, 0, 1
+        GridLayout:
+            cols: 2
+            
+            Label:
+                id: tgtlbl
+                text: ""
+                font_size: 40
+                color: 0.12156862745098039, 0.9176470588235294, 0, 1
+            Slider:
+                min:0
+                max: 100
+                step: 0.01
+                orientation: "horizontal"
+                on_value: root.target_grade(*args)
+                    
+            Label:
+                id: wgtlbl
+                text: ""
+                font_size: 40
+                color: 0.12156862745098039, 0.9176470588235294, 0, 1
+            Slider:
+                min:0
+                max: 100
+                step: 1
+                orientation: "horizontal"
+                on_value: root.next_weight(*args)
+        Label:
+            text: ""
+            id: wgtneeded
+            font_size: 40
+            color: 0.12156862745098039, 0.9176470588235294, 0, 1
+        Label:
+            text: ""
+            id: ptsneeded
+            font_size: 40
+            color: 0.12156862745098039, 0.9176470588235294, 0, 1
