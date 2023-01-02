@@ -1,0 +1,2762 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    
+
+
+<link rel="apple-touch-icon" href="/genesis/images/ipad-icon.png"/>
+<link rel="shortcut icon" href="/genesis/images/newIcon2.ico" type="image/x-icon"/>
+<link href="/genesis/styles/parents.css?rnd=1" rel="stylesheet" type="text/css"/>
+
+
+<script src="/genesis/public/jquery-3.6.0.min.js"></script>
+
+<script src="/genesis/public/jquery-ui-1.12.1.custom/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="/genesis/public/jquery-ui-1.12.1.custom/jquery-ui.min.css" />
+
+<title>Parents</title>
+
+    <script type="text/javascript">
+
+        function viewDocument(courseid, assignmentid, name, type)
+        {
+            window.open('/genesis/parents?tab1=studentdata&tab2=gradebook&tab3=coursesummary&studentid=9800826&action=viewDocument&courseid=' + courseid + '&stripCode=' + assignmentid + '&fileName=' + encodeURIComponent(name) + '&fileType=' + type,'Document');
+        }
+
+        function displayComments(assignmentid)
+        {
+            var objPicture = document.getElementById('picComment' + assignmentid);
+            if (document.getElementById('divComments' + assignmentid).style.display == 'none')
+            {
+                document.getElementById('divComments' + assignmentid).style.display = 'inline';
+            }
+            else
+                document.getElementById('divComments' + assignmentid).style.display = 'none';
+        }
+
+        function printRubric(assignmentid, courseCode, courseSection, schoolCode, courseid)
+        {
+            window.open('/genesis/parents?tab1=studentdata&tab2=gradebook&studentid=9800826&type=class&grades=y&action=printRubric&schoolYear=2022-23&schoolCode=' + schoolCode + '&assignmentid=' + assignmentid + '&courseCode=' + courseCode + '&courseSection=' + courseSection + '&courseid=' + courseid,'','location=no,status=no');
+        }
+
+        function openDescriptionDiv(assid)
+        {
+            if (document.getElementById('divDescription' + assid).style.display == 'none')
+            {
+                var ta = document.getElementById('divDescription' + assid);
+                document.getElementById('divDescription' + assid).style.display = 'inline-block';
+                document.getElementById('EndDescription' + assid).focus();
+            }
+            else
+                document.getElementById('divDescription' + assid).style.display = 'none';
+        }
+
+        function changeCourse(courseSectionKey)
+        {
+            var courseCode      = courseSectionKey.substring(0,courseSectionKey.indexOf(":"));
+            var courseSection   = courseSectionKey.substring(courseSectionKey.indexOf(":") + 1);
+            location.href = '/genesis/parents?tab1=studentdata&tab2=gradebook&tab3=coursesummary&studentid=9800826&mp=MP2&action=form&courseCode=' + courseCode + '&courseSection=' + courseSection;
+        }
+
+        function displayMPs()
+        {
+            $( '#divChangeMarkingPeriod').dialog({
+                resizable: false,
+                height:'auto',
+                width:'auto',
+                modal: true,
+                buttons: {
+                    'Switch Marking Period': function() {
+                        $( this ).dialog( "close" );
+                        var markingPeriod = document.getElementById('fldSwitchMP').value;
+                        location.href = '/genesis/parents?tab1=studentdata&tab2=gradebook&tab3=coursesummary&studentid=9800826&mp=' + markingPeriod + '&action=form&courseCode=183078&courseSection=2';
+                    },
+                    Cancel: function() {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            });
+
+        }
+
+    </script>
+</head>
+<body class="parentsBody">
+
+
+
+
+
+
+ <!-- Needed to determine access to certain tabs (conferences, letters) -->
+
+
+
+
+    
+
+
+<script type="text/javascript">
+    function changeStudent(newstudentid)
+    {
+        location.href = document.URL.replace('9800826',newstudentid);
+    }
+
+    function header_goToTab(newTab1, appendParams)
+    {
+        if (appendParams == '')
+            location.href='/genesis/parents?tab1=' + newTab1 + '&action=form';
+        else
+            location.href='/genesis/parents?tab1=' + newTab1 + '&action=form' + '&' + appendParams;
+    }
+
+    function confirmDialog(questionToAsk, okFunction, cancelFunction)
+    {
+        $( "#_dialog-confirm_" ).dialog({
+            resizable: false, height:'auto', width:600, modal: true,
+            title: 'Confirmation',
+            open: function()
+            {
+                $('#_confirmDialogText_').html(questionToAsk);
+            },
+            buttons:
+                {
+                    Ok: function()
+                    {
+                        $( this ).dialog( "close" );
+                        if (okFunction!=null)
+                            okFunction();
+                    },
+                    Cancel: function()
+                    {
+                        $( this ).dialog( "close" );
+                        if (cancelFunction!=null)
+                            cancelFunction();
+                    }
+                }
+        });
+    }
+
+    function alertDialog(alertText, okCallback)
+    {
+        $( "#_dialog-alert_" ).dialog({
+            resizable: false, height:'auto', width:600, modal: true,
+            title: 'Information',
+            open: function()
+            {
+                $('#_confirmAlertText_').html(alertText);
+            },
+            buttons:
+                {
+                    Ok: function()
+                    {
+                        $( this ).dialog( "close" );
+                        if (okCallback)
+                            okCallback();
+                    }
+                }
+        });
+    }
+
+    function promptDialog(questionToAsk, defaultAnswer, okFunction, cancelFunction)
+    {
+        if (defaultAnswer==null) defaultAnswer = '';
+        $( "#_dialog-prompt_" ).dialog({
+            resizable: false, height:'auto', width:600, modal: true,
+            title: 'Prompt',
+            open: function()
+            {
+                $('#_confirmPromptText_').html(questionToAsk);
+                $('#_prompt_dialog_value_').val(defaultAnswer).removeClass('fieldValueChanged').addClass('fieldValue').focus().select();
+            },
+            buttons:
+                {
+                    Ok: function()
+                    {
+                        $( this ).dialog( "close" );
+                        if (okFunction!=null)
+                        {
+                            var __prompt__answer = $('#_prompt_dialog_value_').val();
+                            if (__prompt__answer == null) __prompt__answer = '';
+                            $('#_prompt_dialog_value_').removeClass('fieldValueChanged').addClass('fieldValue');
+                            okFunction(__prompt__answer);
+                        }
+                    },
+                    Cancel: function()
+                    {
+                        $( this ).dialog( "close" );
+                        if (cancelFunction!=null)
+                            cancelFunction();
+                    }
+                }
+        });
+    }
+
+    function confirmDialogWarning(questionToAsk, okFunction, cancelFunction)
+    {
+        confirmDialogDisplay(questionToAsk, okFunction, cancelFunction, true);
+    }
+
+    function confirmDialogDisplay(questionToAsk, okFunction, cancelFunction, useWarningIcon)
+    {
+        $( "#_dialog-confirm_" ).dialog({
+            resizable: false, height:'auto', width:600, modal: true,
+            title: 'Confirmation',
+            open: function()
+            {
+                $('#_confirmDialogText_').html(questionToAsk);
+                if (useWarningIcon)
+                {
+                    $('#_confirmDialogIcon_').attr("src","/genesis/images/warning.gif");
+                }
+            },
+            buttons:
+                {
+                    Ok: function()
+                    {
+                        $( this ).dialog( "close" );
+                        if (okFunction!=null)
+                            okFunction();
+                    },
+                    Cancel: function()
+                    {
+                        $( this ).dialog( "close" );
+                        if (cancelFunction!=null)
+                            cancelFunction();
+                    }
+                }
+        });
+    }
+
+    function toggleDisclaimer()
+    {
+        location.href = document.URL + '&toggleDisclaimer=true';
+    }
+
+    function toggleGBDisclaimer()
+    {
+        location.href = document.URL + '&toggleGBDisclaimer=true';
+    }
+
+    function logout()
+    {
+        
+        try
+        {
+            
+            if(gapi && gapi.auth2 && gapi.auth2.getAuthInstance())
+                revokeAllScopes();
+            else
+                
+                location.href='parents?logout=true'
+        }
+        catch (e)
+        {
+            location.href='parents?logout=true'
+        }
+
+    }
+
+    function displayPasswordInReadOnlyTextField(fieldID)
+    {
+        var displayField = document.getElementById('readonly' + fieldID);
+        var hiddenField = document.getElementById(fieldID);
+        if (displayField != null && hiddenField != null)
+        {
+            var displayFieldValue = displayField.innerHTML;
+            if (displayFieldValue.startsWith('****'))
+                displayFieldValue = hiddenField.value;
+            else
+                displayFieldValue = '********';
+        }
+        displayField.innerHTML = displayFieldValue;
+    }
+
+    
+    var revokeAllScopes = function() {
+        try
+        {
+            var auth2 = gapi.auth2.getAuthInstance();
+
+            auth2.disconnect();
+
+            auth2.signOut()
+                .then(() => window.location.href='parents?logout=true')
+                .catch(() => window.location.href='parents?logout=true');
+        }
+        catch (e)
+        {
+            window.location.href="view?logout=true";
+        }
+    }
+    
+
+    
+</script>
+<!-- Start of Header-->
+
+
+
+
+<div class="headerModules">
+    <div style="text-align: left; float:left; white-space: nowrap; ">
+        <span style="font-size:18pt; font-weight: 600; text-transform: none; text-wrap: none; margin-left:28px;margin-top: 2px; ">
+            <img src="/genesis/images/genesis-logo405x103.png" alt="Genesis" style="height:40px; margin-left:5px; vertical-align: bottom;margin-top: 4px;margin-right: 7px;" align="left">
+            <br/>
+            
+                Parent Resources
+            
+            
+        </span>
+    </div>
+    <div style="text-align: right; white-space: nowrap">
+
+        
+        <td>
+            
+                
+                    
+                        
+
+                        
+                        
+                            
+                            
+                        
+
+                        
+                        <span style="position:relative" class="headerModuleTab" onclick="header_goToTab('messagecenter','studentid=9800826');">
+                            <img src="/genesis/parents/images/buttons/house_blue.png" alt="" style="vertical-align: bottom"/>
+                            Message Center
+                            
+                                
+                                
+                                
+                                <div title="30" style="width:13px;height:13px;background-color:red;border-radius:10px;position:absolute;top:2px;right:2px;padding:1px 2px 2px 1.5px;font-size:10px;text-align:center">
+                                    <div style="color:white">
+                                            30
+                                    </div>
+                                </div>
+                            
+                            
+                                
+                            
+                        </span>
+                    
+                
+            
+                
+                    
+                        
+
+                        
+                            
+                            
+                            
+                        
+                        
+
+                        
+                        <span  class="headerModuleTabSelected" onclick="header_goToTab('studentdata','studentid=9800826');">
+                            <img src="/genesis/parents/images/buttons/students_white.png" alt="" style="vertical-align: bottom"/>
+                            Student Data
+                            
+                            
+                                
+                            
+                        </span>
+                    
+                
+            
+                
+                    
+                        
+
+                        
+                        
+                            
+                            
+                        
+
+                        
+                        <span  class="headerModuleTab" onclick="header_goToTab('contacts','studentid=9800826');">
+                            <img src="/genesis/parents/images/buttons/notebook_blue.png" alt="" style="vertical-align: bottom"/>
+                            Contacts
+                            
+                            
+                                
+                            
+                        </span>
+                    
+                
+            
+                
+                    
+                        
+
+                        
+                        
+                            
+                            
+                        
+
+                        
+                        <span  class="headerModuleTab" onclick="header_goToTab('setup','studentid=9800826');">
+                            <img src="/genesis/parents/images/buttons/settings_blue.png" alt="" style="vertical-align: bottom"/>
+                            Settings
+                            
+                            
+                                
+                            
+                        </span>
+                    
+                
+            
+        </td>
+
+        <span class="headerModuleTab" onclick="logout();">
+            <img src="/genesis/parents/images/buttons/lock_blue.png" alt="" style="vertical-align: bottom"/>
+            Logout
+        </span>
+        &nbsp;
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="headerCategories">
+    <div class="headerCategories" style="height:15px;">&nbsp;</div>
+
+    
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=studentsummary','studentid=9800826');">
+                            Summary
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=attendance','studentid=9800826');">
+                            Attendance
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=grading','studentid=9800826');">
+                            Grading
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=discipline','studentid=9800826');">
+                            Discipline
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=feesAndFines','studentid=9800826');">
+                            Fees And Fines
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                        
+                        
+                    
+                    
+
+                    
+                    
+                        <span class="headerCategoryTabSelected" onclick="header_goToTab('studentdata&tab2=gradebook','studentid=9800826');">
+                            Gradebook
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=scheduling','studentid=9800826');">
+                            Scheduling
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=documents','studentid=9800826');">
+                            Documents
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=forms','studentid=9800826');">
+                            Forms
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=coursepages','studentid=9800826');">
+                            Course Pages
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=conferences','studentid=9800826');">
+                            Conferences
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=letters','studentid=9800826');">
+                            Letters
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=checkins','studentid=9800826');">
+                            Check Ins
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=school','studentid=9800826');">
+                            School Information
+                        </span>
+                    
+
+                
+            
+        
+            
+                
+                    
+
+                    
+                    
+                        
+                    
+
+                    
+                    
+                        <span class="headerCategoryTab" onclick="header_goToTab('studentdata&tab2=athletics','studentid=9800826');">
+                            Athletics
+                        </span>
+                    
+
+                
+            
+        
+    
+</div>
+
+
+    <div class="headerStudentSelector">
+        <div class="headerStudentSelector" style="height:11px;">&nbsp;</div>
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td width="50%" style="font-size: 2.4em;font-weight: 300; margin-top: 8px;">
+                    
+                </td>
+
+                <td width="50%">
+                    <label for="fldStudent" style="text-transform: uppercase;">Select Student:</label>
+                    <select name="fldStudent" id="fldStudent" class="headerStudentSelectorInput" onchange="changeStudent(this.value);">
+                        
+                            <option value="9800826" selected>Shah, Rohan </option>
+                        
+                    </select>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+
+    <br>
+    <div class="studentTabBar">
+    
+        
+            
+                
+
+                
+                
+                    
+                
+
+                
+                
+                    <span class="studentTab" onclick="header_goToTab('studentdata&tab2=gradebook&tab3=weeklysummary','studentid=9800826');">
+                        Weekly Summary
+                    </span>
+                
+
+            
+        
+    
+        
+            
+                
+
+                
+                
+                    
+                
+
+                
+                
+                    <span class="studentTab" onclick="header_goToTab('studentdata&tab2=gradebook&tab3=listassignments','studentid=9800826');">
+                        List Assignments
+                    </span>
+                
+
+            
+        
+    
+        
+            
+                
+
+                
+                    
+                    
+                
+                
+
+                
+                
+                    <span class="studentTabSelected" onclick="header_goToTab('studentdata&tab2=gradebook&tab3=coursesummary','studentid=9800826');">
+                        Course Summary
+                    </span>
+                
+
+            
+        
+    
+        
+            
+        
+    
+    </div>
+
+
+
+
+
+
+
+
+
+
+    <div style="padding:1px 0 1px 0; font-size: 12pt;">
+        <table cellpadding="0" cellspacing="0" border="0" style="width:100%;">
+            <tr>
+                
+                <td style="padding-left: 10px;">Wednesday, 12/21/2022 6:20PM</td>
+                <td style="text-align: right; padding-right: 10px; color: blue;">&nbsp;</td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <div style="min-width: 100px; max-width: 800px; margin: auto;">
+                        <div style="text-align: right; padding: 2px 5px 0 0;">
+                           <span onclick="toggleDisclaimer();" style="cursor: pointer; color: blue; font-size: 8pt;">
+                               Hide Message
+                               
+                           </span>
+                        </div>
+                        
+                            <div style="border: 1px solid #dadada; background-color: #fefefe; padding: 1px 10px 1px 10px;"><p>This website and its content are confidential and intended solely for the use of the individual or entity to which it was intended. If you have received access to information not intended for you please notify us using <a href="https://forms.gle/4vReEz4bUN2fgiFY6">this form</a>. In addition, you are notified that disclosing, copying, or distributing this information is strictly prohibited.</p>
+
+<p>Este sitio web y su contenido son confidenciales y est&aacute;n destinados &uacute;nicamente para el uso de la persona o entidad a la que est&aacute; destinado. Si ha recibido acceso a informaci&oacute;n que no est&aacute; destinada a usted, notif&iacute;quese mediante <a href="http://forms.gle/4vReEz4bUN2fgiFY6">este formulario</a>. Adem&aacute;s, se le notifica que est&aacute; estrictamente prohibido divulgar, copiar o distribuir esta informaci&oacute;n.</p>
+
+<p>&nbsp;</p>
+</div>
+                        
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div style="height: 10px;"></div>
+
+
+
+
+
+<script>
+    function _toggleFormCheckBox(id, flipChecked)
+    {
+        var checkbox = document.getElementById(id);
+        var image = document.getElementById(id + "Img");
+        var parent = checkbox.parentElement;
+
+
+        if(checkbox)
+        {
+            checkbox.checked = !checkbox.checked;
+            image.className = checkbox.checked ? '' : 'hideImage';
+            parent.className = checkbox.checked ? 'formCheckbox checked' : 'formCheckbox';
+        }
+
+        checkbox.onchange();
+    }
+</script>
+
+
+
+
+
+
+<div id="divChangeMarkingPeriod" style="display:none;" title="Switch Marking Period">
+    <div style="padding:20px;" class="alignCenter">
+        Switch to
+        <select id="fldSwitchMP" class="fieldvalue">
+            
+                <option value="MP1" >Marking Period 1</option>
+            
+                <option value="MP2" selected>Marking Period 2</option>
+            
+                <option value="MP3" >Marking Period 3</option>
+            
+                <option value="MP4" >Marking Period 4</option>
+            
+        </select>
+    </div>
+</div>
+
+<div style="text-align: center;font-weight: bold;font-size: 14pt;">
+    <span  style="text-shadow: 1px 1px 1px rgba(0,0,0,0.3)">Course Summary for</span>
+    <select name="fldCourse" id="fldCourse" class="headerFunkySelectorInput" onchange="changeCourse(this.value);">
+        
+            <option value="130400:2" >AP Statistics</option>
+        
+            <option value="130500:2" >AP Calculus</option>
+        
+            <option value="150400:1" >AP Physics C</option>
+        
+            <option value="183078:2" selected>Fundamental Economics &amp; Wealth Management (H)</option>
+        
+    </select>
+</div>
+
+
+
+
+
+
+
+
+
+
+    <div style="text-align: center;font-size: 12pt;padding:5px;">
+
+        
+        
+        
+        
+        
+        
+        Marking Period 2 Grade:
+        <b>
+            
+            
+                
+                    96.5%
+                
+                
+                    
+                    &nbsp;A
+                
+            
+            
+        </b>
+        &nbsp;&nbsp;
+        <span style="color: blue; font-size: 8pt; text-decoration: underline; cursor: pointer;" onclick="displayMPs();">Change Marking Period</span>
+    </div>
+
+
+<table role="main" aria-label=" + m_title + " class="notecard" style=""><tr><td class="notecardTitle"> </td><td class="notecardTitle" style="width:35px;text-align:right"></td></tr><tr><td colspan="2" >
+
+    <div style="font-size: 12pt; max-width: 1200px">
+
+        <table class="list" style="margin:auto;">
+            <tr>
+                <td colspan="15">
+                    <div style="float:left;font-size: 14pt;">
+                        <b>Assignments</b>&nbsp;&nbsp;&nbsp;
+                        
+                        
+                        <span style="font-size: 11pt;">Marking Period 2&nbsp;&nbsp;&nbsp;11/15/22 to 01/26/23</span>
+                    </div>
+                    
+                        <div style="font-size: 10pt;font-style: italic;text-align: right;float:right;padding-right:20px;">Last grade posted on 12/20</div>
+                    
+                </td>
+            </tr>
+
+            <tr class="listheading">
+                <td nowrap class="cellLeft">MP</td>
+                <td nowrap class="cellLeft">Due</td>
+                <td nowrap class="cellLeft">Teacher</td>
+                <td nowrap class="cellLeft">Category</td>
+                <td nowrap class="cellLeft">Assignment</td>
+                <td nowrap class="cellLeft">
+                    Grade
+                    <img width="16" tabindex="0" class="icon" role="button" src="/genesis/images/newIcons/infoGreen.svg" style="cursor:help;vertical-align:text-bottom;"onclick="showAutoTooltip('dialog-auto-tooltip1','400');" title="Percentage is rounded to Tenths Place"/><script type="text/javascript">  function showAutoTooltip(dialogDivId, dialogWidth)
+        {
+            $( '#' + dialogDivId).dialog({
+                title: 'Information',
+                resizable: false,
+                height:'auto',
+                width: dialogWidth,
+                modal: true,
+                buttons:
+                {
+                    OK: function()
+                    {
+                        $( this ).dialog( "close" );
+                    }
+                }
+            });
+        }
+</script>
+                </td>
+                <td nowrap class="cellLeft">Comment</td>
+                <td nowrap class="cellLeft">Prev</td>
+                <td nowrap class="cellLeft">Docs</td>
+            </tr>
+
+            
+
+            
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                <tr class="listroweven" height="25px">
+                
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Tue</div>
+                    <div>12/13</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1260286" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1260286');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">Supply and Demand Quiz</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">Students will take a quiz related to supply and demand together. Notes are permitted to be used on the quiz</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1260286" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1260286');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>Supply and Demand Quiz</b><div style='font-style:italic;padding-left:10px;'>Students will take a quiz related to supply and demand together. Notes are permitted to be used on the quiz</div>
+                    
+                    
+                    <div id="divComments1260286" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1260286');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                39
+                                
+                                    / 42
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                92.9%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                
+                <tr class="listrowodd" height="25px">
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Mon</div>
+                    <div>12/12</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1259489" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1259489');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">Supply and Demand Curves Shift</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">Students will create their own scenario based on a good and demonstrate whether the supply or demand curve will shift and what will happen to price and quantity as a result.</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1259489" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1259489');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>Supply and Demand Curves Shift</b><div style='font-style:italic;padding-left:10px;'>Students will create their own scenario based on a good and demonstrate whether the supply or demand curve will shift and what will happen to price and quantity as a result.</div>
+                    
+                    
+                    <div id="divComments1259489" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1259489');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                8
+                                
+                                    / 8
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                100.0%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                <tr class="listroweven" height="25px">
+                
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Tue</div>
+                    <div>12/6</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1257804" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1257804');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">Supply and Demand Together</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">Students will use the stock market challenge to analyze two companies in their portfolio and determine what factors that affect supply and demand could influence the price of the stock.</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1257804" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1257804');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>Supply and Demand Together</b><div style='font-style:italic;padding-left:10px;'>Students will use the stock market challenge to analyze two companies in their portfolio and determine what factors that affect supply and demand could influence the price of the stock.</div>
+                    
+                    
+                    <div id="divComments1257804" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1257804');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                3
+                                
+                                    / 3
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                100.0%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                
+                <tr class="listrowodd" height="25px">
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Fri</div>
+                    <div>12/2</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1257785" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1257785');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">Supply Elasticity</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">Students will respond to 3 open-ended questions regarding Supply elasticity</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1257785" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1257785');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>Supply Elasticity</b><div style='font-style:italic;padding-left:10px;'>Students will respond to 3 open-ended questions regarding Supply elasticity</div>
+                    
+                    
+                    <div id="divComments1257785" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1257785');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                3
+                                
+                                    / 3
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                100.0%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                <tr class="listroweven" height="25px">
+                
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Thu</div>
+                    <div>12/1</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1253800" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1253800');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">Supply Curve Group Quiz</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">Students will work with their groups to determine which direction the supply curve will shift and which factor caused the shift.</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1253800" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1253800');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>Supply Curve Group Quiz</b><div style='font-style:italic;padding-left:10px;'>Students will work with their groups to determine which direction the supply curve will shift and which factor caused the shift.</div>
+                    
+                    
+                    <div id="divComments1253800" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1253800');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                13.5
+                                
+                                    / 14
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                96.4%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                
+                <tr class="listrowodd" height="25px">
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Wed</div>
+                    <div>11/30</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1253519" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1253519');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">The Supply Curve</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">In groups, students will each role play as a producer that supplies the same good as everyone else in the group. They will each create a supply schedule for the particular good and each creates an individual supply curve. Then, as a group, they will create a market supply curve for the good.</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1253519" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1253519');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>The Supply Curve</b><div style='font-style:italic;padding-left:10px;'>In groups, students will each role play as a producer that supplies the same good as everyone else in the group. They will each create a supply schedule for the particular good and each creates an individual supply curve. Then, as a group, they will create a market supply curve for the good.</div>
+                    
+                    
+                    <div id="divComments1253519" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1253519');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                3
+                                
+                                    / 3
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                100.0%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                <tr class="listroweven" height="25px">
+                
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Wed</div>
+                    <div>11/30</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1254269" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1254269');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">Supply Curve Shifts</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">Students will create 8 supply curves and demonstrate how they shift based on each factor of supply</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1254269" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1254269');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>Supply Curve Shifts</b><div style='font-style:italic;padding-left:10px;'>Students will create 8 supply curves and demonstrate how they shift based on each factor of supply</div>
+                    
+                    
+                    <div id="divComments1254269" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1254269');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                8
+                                
+                                    / 8
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                100.0%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                
+                <tr class="listrowodd" height="25px">
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Wed</div>
+                    <div>11/23</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1253024" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1253024');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">Elasticity of Demand Scenarios</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">Students provided two scenarios related to the elasticity of demand. They will use logic and the concepts related to elasticity to determine the affect on demand for each scenario</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1253024" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1253024');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>Elasticity of Demand Scenarios</b><div style='font-style:italic;padding-left:10px;'>Students provided two scenarios related to the elasticity of demand. They will use logic and the concepts related to elasticity to determine the affect on demand for each scenario</div>
+                    
+                    
+                    <div id="divComments1253024" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1253024');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                7
+                                
+                                    / 7
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                100.0%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                <tr class="listroweven" height="25px">
+                
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Tue</div>
+                    <div>11/22</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1253027" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1253027');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">Demand Elasticity</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">Students will use the 4 factors that determine elasticity to provide examples of the affect on a particular good</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1253027" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1253027');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>Demand Elasticity</b><div style='font-style:italic;padding-left:10px;'>Students will use the 4 factors that determine elasticity to provide examples of the affect on a particular good</div>
+                    
+                    
+                    <div id="divComments1253027" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1253027');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                5
+                                
+                                    / 5
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                100.0%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                
+                <tr class="listrowodd" height="25px">
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Wed</div>
+                    <div>11/16</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1251454" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1251454');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">Income and Demand</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">Students will create a cost-benefit analysis chart for whether to buy a new car or a used car based on whether their income is rising or falling.</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1251454" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1251454');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>Income and Demand</b><div style='font-style:italic;padding-left:10px;'>Students will create a cost-benefit analysis chart for whether to buy a new car or a used car based on whether their income is rising or falling.</div>
+                    
+                    
+                    <div id="divComments1251454" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1251454');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                4
+                                
+                                    / 4
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                100.0%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+
+                
+                
+
+                <tr class="listroweven" height="25px">
+                
+
+                <td class="cellLeft" height="25px">MP2</td>
+                <td class="cellLeft" height="25px">
+                    <div>Wed</div>
+                    <div>11/16</div>
+                </td>
+                <td class="cellLeft" height="25px">D, Patrick</td>
+                <td class="cellLeft" height="25px">
+                    <div style="display:none;background-color: white;border:1px ridge #dcdcdc;position:absolute; width:400px;min-height:100px;overflow: hidden;" id="divDescription1251434" class="boxShadow">
+                        <table width="100%" cellpadding="2" cellspacing="2">
+                            <tr><td class="cellRight" style="background-color: beige;"><span style="color:blue;cursor:pointer;text-decoration: underline;" onclick="openDescriptionDiv('1251434');">Close</span></td></tr>
+                            <tr><td class="cellCenter" style="font-weight:bold;border: 1px solid black;">Would you buy a new car?</td></tr>
+                            <tr>
+                                <td>
+                                    <div style="font-size: 11pt; min-height: 100px;text-align: left;margin: auto;padding: 0 15px 5px 15px;">Did you decide to buy a new car or a used car? Explain why based on your personal income scenario and understanding of normal vs inferior goods.</div>
+                                </td>
+                            </tr>
+                            <tr><td align="center">
+                                <input type="button" id="EndDescription1251434" class="fieldvalue" value="Close Window" onclick="openDescriptionDiv('1251434');">
+                            </td></tr>
+                        </table>
+                    </div>
+                    Homework
+                    
+                </td>
+                <td class="cellLeft">
+                    
+                    
+                    
+                        
+                    
+                    
+                        <b>Would you buy a new car?</b><div style='font-style:italic;padding-left:10px;'>Did you decide to buy a new car or a used car? Explain why based on your personal income scenario and understanding of normal vs inferior goods.</div>
+                    
+                    
+                    <div id="divComments1251434" style="display:none;position:absolute;width:450px;background-color:#f5f5f5;border:1px solid #000000;text-align: center;padding-bottom: 5px;" class="boxShadow">
+                        <table width="100%" class="fieldlabel">
+                            <tr>
+                                <td align="left" style="font-weight:bold;text-decoration: underline;">Comment from D, Patrick:</td>
+                                <td align="right"><span style="text-align: right;color:blue;cursor:pointer;" onclick="displayComments('1251434');">Close</span></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2" align="left">
+                                    
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </td>
+
+                
+                
+
+                
+                
+                
+                
+                
+                
+                
+                    <td nowrap class="cellLeft" align="right" >
+
+                        
+                        
+                        
+                        
+                        
+                        
+                            
+                                2
+                                
+                                    / 2
+                                
+                            
+                            
+                        
+                        
+                        
+                            <div style="font-weight: bold;">
+                                100.0%
+                            </div>
+                        
+                        
+                    </td>
+                
+                
+                <td class="cellLeft">
+                    
+                </td>
+                
+                
+                
+                
+                
+                <td class="cellLeft" title="" ></td>
+
+                <td class="cellLeft" title="Assignment Documents">
+                    
+                        
+                        
+                        
+                    
+                </td>
+                </tr>
+
+                
+            
+            <tr><td colspan="15">
+                <div style="font-size: 10pt;padding-top:5px;padding-left: 10px;">* Assignments graded as <b>E (Exempt)</b> or <b>A (Absent)</b> do not impact a student's grade.</div>
+                <div style="font-size: 10pt;padding-bottom:5px;padding-left: 10px;">* Assignments graded as <b>M (Missing)</b> counts as <b>0.0%</b> and <b>I (Incomplete)</b> counts as <b>0.0%</b>.</div>
+            </td></tr>
+
+            <tr>
+                <td colspan="15">
+                    <div style="padding-top: 22px;">
+                        <div style="text-align: left;font-size: 14pt;padding-bottom:3px;"><b>Grading Information</b> <span style="font-size: 11pt;">Marking Period 2</span></div>
+                        
+                        
+                            <div style="padding-bottom: 8px;">Students are graded by <b>Category Weighting</b> in this course.  A grade is calculated by taking the average of each category and getting a value for the category based on the weight.  Each category score is then added and a total average is formulated.</div>
+                            <table class="list" style="margin:auto;">
+                                <tr class="listheading">
+                                    <td nowrap class="cellLeft">Category</td>
+                                    <td nowrap class="cellLeft">Weight</td>
+                                    
+                                    
+                                </tr>
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        <tr class="listrowodd" height="25px">
+                                            <td nowrap class="cellLeft"><b>Homework</b></td>
+                                            <td nowrap class="cellRight">25.0 %</td>
+                                            
+                                            
+                                        </tr>
+                                    
+                                    
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        <tr class="listroweven" height="25px">
+                                            <td nowrap class="cellLeft"><b>Quizzes</b></td>
+                                            <td nowrap class="cellRight">25.0 %</td>
+                                            
+                                            
+                                        </tr>
+                                    
+                                    
+                                
+                                    
+                                    
+                                    
+                                    
+                                    
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        
+                                        <tr class="listrowodd" height="25px">
+                                            <td nowrap class="cellLeft"><b>Tests</b></td>
+                                            <td nowrap class="cellRight">50.0 %</td>
+                                            
+                                            
+                                        </tr>
+                                    
+                                    
+                                
+                            </table>
+                        
+                    </div>
+
+                        
+                            
+                        
+
+                </td>
+            </tr>
+
+            
+                <tr>
+                    <td colspan="15">
+                        
+                        <div style="padding-top: 30px;text-align: center;font-size: 14pt;"><b>Class Attendance Summary</b>&nbsp;&nbsp;&nbsp;<span style="font-size: 11pt;">Year to Date</span></div>
+                        <table class="list" style="margin: auto;">
+                            <tr class="listheading">
+                                <td class="cellLeft">Type</td>
+                                <td class="cellRight">Total</td>
+                                <td class="cellRight">Unexcused</td>
+                                <td class="cellRight">Excused</td>
+                            </tr>
+                            <tr class="listroweven">
+                                <td class="cellLeft"><b>Absences&nbsp;</b></td>
+                                <td class="cellRight">0.0</td>
+                                <td class="cellRight">0.0</td>
+                                <td class="cellRight">0.0</td>
+                            </tr>
+                            <tr class="listrowodd">
+                                <td class="cellLeft"><b>Tardies&nbsp;</b></td>
+                                <td class="cellRight">0.0</td>
+                                <td class="cellRight">0.0</td>
+                                <td class="cellRight">0.0</td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            
+
+        </table>
+
+    </div>
+
+</td></tr></table>
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+    function toggleLanguage()
+    {
+        location.href = document.URL + '&toggleLanguage=true';
+    }
+
+    function toggleMobileSite()
+    {
+        location.href = document.URL + '&toggleMobileSite=true';
+    }
+</script>
+
+  <table class="footer" cellpadding="0" cellspacing="0">
+      <tr>
+          <td>
+              <div id="google_translate_element"></div>
+              <script type="text/javascript">
+                    // TODO: If any changes are made to includedLanguages, copy them to parentsFooterMobile.jsp and openRegistration/header.jsp
+
+                  function googleTranslateElementInit() {
+                                  new google.translate.TranslateElement({pageLanguage: 'en'}, 'google_translate_element'); }
+              </script>
+              <script type="text/javascript" src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"></script>
+
+              
+                  
+              
+
+              <a style="margin-left: 10pt;" target="_top" href="javascript:toggleMobileSite();">
+                  Mobile
+              </a>
+          </td>
+          <td style="text-align: right">
+              &copy;Copyright Genesis Educational Services,Inc.
+          </td>
+      </tr>
+  </table>
+
+
+    
+        
+        
+            <div style="display:none">
+                <div id="dialog-auto-tooltip1" title="" style="background-color:#FFFFF1">
+                     Percentage is rounded to Tenths Place
+                </div>
+            </div>
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+        
+        
+    
+
+<div style="display:none">
+    <div id="_dialog-confirm_" title="" style="background-color:#FFFFF1">
+        <table>
+            <tr>
+                <td> <img src="/genesis/images/help2_48.png" /> </td>
+                <td>
+                    <div id="_confirmDialogText_" >
+
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="_dialog-prompt_" title="" style="background-color:#FFFFF1">
+        <table>
+            <tr>
+                <td> <img src="/genesis/images/help2_48.png" /> </td>
+                <td>
+                    <div id="_confirmPromptText_" >
+
+                    </div>
+                    <f2:text nameId="_prompt_dialog_value_" size="50" maxlength="255" value="" />
+                </td>
+            </tr>
+        </table>
+    </div>
+    <div id="_dialog-alert_" title="" style="background-color:#FFFFF1">
+        <table>
+            <tr>
+                <td> <img src="/genesis/images/info_48.png" /> </td>
+                <td>
+                    <div id="_confirmAlertText_" >
+
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+</body>
+</html>
