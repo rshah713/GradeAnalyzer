@@ -1,6 +1,8 @@
 # GradeAnalyzer
 Compute statistics for [Genesis Grade Portal](https://parents.ewrsd.k12.nj.us/genesis/parents?gohome=true).
 
+![Demo Gif](./GradeAnalyzerDemo.gif)
+
 
 ## Usage
 1. Save the HTML of a specific Genesis class
