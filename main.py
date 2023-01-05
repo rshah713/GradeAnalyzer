@@ -82,14 +82,7 @@ def weight_needed(target_grade):
     # IM A GENIUS FOR FIGURING THIS FORMULA OUT
     # weight_needed = ((final grade * total weight) - (100 * achieved points)) / (100 - final grade)
     weight_needed = (target_grade * TTL_POINTS) - (100 * PTS_ACHIEVED)
-    try:
-        weight_needed /= abs(100 - target_grade)
-    except ZeroDivisionError:
-        print()
-        print(target_grade)
-        print()
-        target_grade = 99.7
-        weight_needed /= abs(100 - target_grade)
+    weight_needed /= abs(100 - target_grade)
     return weight_needed
 
 def maintain_current_grade(w):
