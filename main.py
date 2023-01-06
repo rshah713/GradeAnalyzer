@@ -52,8 +52,6 @@ def process_data():
         res[1] = int(res[1].split(' ')[1])
         total.append(res)
         
-    print(total)
-        
     # res: ['7', '/ 10', '70.0%'] where 
     # res[0] -> points achieved
     # res[1] -> total points
