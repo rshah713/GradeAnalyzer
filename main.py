@@ -91,10 +91,6 @@ pts_needed = points_needed(90, 40)
 maintain = maintain_current_grade(30)
 weight = weight_needed(93)
 
-print("Need a {}/{} (a {:.2f}%) to end with an {}".format(pts_needed, 40, pts_needed*100/40, 90))
-print("Need a 100% on a {:.2f}pt assignment to end with a {}".format(weight, 93))
-print("Need a {}/{} (a {:.2f}%) to maintain current grade".format(maintain, 30, maintain*100/30))
-
 ######################## KIVY GUI ########################
 
 kv = Builder.load_file("GradeAnalyzer.kv")
