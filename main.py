@@ -1,7 +1,7 @@
-#!/usr/bin/env python
-# coding: utf-8
-
 """
+Rohan Shah
+
+
 Save HTML file of specific Genesis class
     - format: https://parents.ewrsd.k12.nj.us/genesis/parents?tab1=studentdata&tab2=gradebook&tab3...
 Program built to parse and extract existing grades and values to predict assignment
