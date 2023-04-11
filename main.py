@@ -107,8 +107,16 @@ class Main(Widget):
         self.weightneeded.text = "{:.2f}pt assignment to reach {}%".format(weight, self.target)
         
     def read_data(self, filename):
-        read_file(filename)
-        process_data()
+        try:
+            read_file(filename)
+            process_data()
+            
+            self.file_status.text = "Information Loaded Successfully"
+            self.file_status.color = (0.12156862745098039, 0.9176470588235294, 0, 1)
+        except FileNotFoundError:
+            self.file_status.color = (1, 0, 0, 1)
+            self.file_status.text = "Error loading " + filename
+        
         
     def get_target(self):
         return str(self.target)

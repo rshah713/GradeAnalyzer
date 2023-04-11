@@ -8,6 +8,7 @@
     weightlabel: wgtlbl
     weightneeded: wgtneeded
     pointsneeded: ptsneeded
+    file_status: file_status
     
         
     GridLayout:
@@ -31,7 +32,11 @@
                 size_hint: (.6, .4) # button_width, button_height
                     
                 on_press: root.read_data(filename.text)
-        Widget:
+        Label:
+            id: file_status
+            text: ""
+            font_size: 40
+            color: 0.12156862745098039, 0.9176470588235294, 0, 1
         
         Label:
             text: "Customize:"
